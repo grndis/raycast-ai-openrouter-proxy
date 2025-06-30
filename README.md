@@ -31,7 +31,7 @@ This proxy aims to provide a seamless experience for using custom models within 
 ### Not Supported:
 
 - 💭 **Displaying thinking process**: Models do not display their thinking process, but thinking models are supported.
-- 🌐 **Remote tools**: Some AI Extensions are classified as "remote tools" and are not supported. These include `@web` and `@gpt_image`, among others. You can replace these with MCP servers if you would like similar tools.
+- 🌐 **Remote tools**: Some AI Extensions are classified as "remote tools" and are not supported. These include web search and image generation, as well as some others. You can replace these with MCP servers if you would like similar tools.
 
 ## Requirements
 
@@ -61,7 +61,7 @@ To get started, follow these steps:
 5. Start the proxy server:
 
    ```bash
-   docker compose up -d
+   docker compose up -d --build
    ```
 
    This will start the proxy server in the background. By default, it will run on port `11435`. If that port is already in use, you can change it in the `docker-compose.yml` file.
@@ -79,7 +79,7 @@ The proxy's behavior is primarily configured through a `models.json` file in the
 - `contextLength`: The maximum context length (in tokens) the model supports. Only affects Raycast's UI and not the model itself.
 - `capabilities`: An array of strings indicating the model's capabilities.
   - `"vision"`: The model can process images.
-  - `"tools"`: The model supports AI Extensions and MCP (tool calling). You need to enable the experimental AI Extensions support in Raycast settings for this to work.
+  - `"tools"`: The model supports AI Extensions and MCP (tool calling). You need to enable the experimental AI Extensions for Ollama Models in Raycast settings for this to work. This can be found at the bottom of the AI settings in Raycast.
 - `temperature`: (Optional) Controls the creativity of the model. A value between 0 and 2.
 - `topP`: (Optional) Another parameter to control the randomness of the output, a value between 0 and 1.
 - `max_tokens`: (Optional) The maximum number of tokens the model is allowed to generate in a single response.
@@ -97,14 +97,14 @@ Example `models.json` structure for OpenRouter:
 [
   {
     "name": "Gemini 2.5 Flash",
-    "id": "google/gemini-2.5-flash-preview-05-20",
+    "id": "google/gemini-2.5-flash",
     "contextLength": 1000000,
     "capabilities": ["vision", "tools"],
     "temperature": 0
   },
   {
     "name": "Gemini 2.5 Flash Thinking",
-    "id": "google/gemini-2.5-flash-preview-05-20:thinking",
+    "id": "google/gemini-2.5-flash:thinking",
     "contextLength": 1000000,
     "capabilities": ["vision", "tools"],
     "temperature": 1
@@ -130,6 +130,15 @@ Example `models.json` structure for OpenRouter:
 ```
 
 ## FAQ
+
+### How does this compare to the official Raycast BYOK feature?
+
+Raycast released a built-in BYOK feature in v1.100.0. The official implementation has a few differences compared to this proxy:
+
+- It only supports Anthropic, Google and OpenAI. This proxy supports any OpenAI-compatible provider.
+- All your messages go through Raycast's servers.
+- Your API keys are sent to Raycast's servers.
+- You have less control over the models and their configurations.
 
 ### What works/does not work?
 
