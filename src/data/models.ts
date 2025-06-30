@@ -43,6 +43,15 @@ export function loadModels(): ModelConfig[] | z.ZodError {
     return parsedModels.error;
   }
 
+  const names = new Set<string>();
+  for (const model of parsedModels.data) {
+    const lowerName = model.name.toLowerCase();
+    if (names.has(lowerName)) {
+      throw new Error(`Duplicate model name found: ${model.name}`);
+    }
+    names.add(lowerName);
+  }
+
   return parsedModels.data;
 }
 
