@@ -8,9 +8,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "lint": "eslint . --max-warnings 0",
-    "lint:fix": "npm run lint -- --fix",
-    "db:up": "docker compose up -d",
-    "db:down": "docker compose down"
+    "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
     "dotenv": "^16.5.0",
