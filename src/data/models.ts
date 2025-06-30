@@ -4,22 +4,46 @@ import fs from 'fs';
 import { z } from 'zod/v4';
 
 export const ModelConfig = z.object({
-  name: z.string(),
-  id: z.string(),
-  contextLength: z.number(),
-  capabilities: z.array(z.enum(['vision', 'tools'])),
-  temperature: z.number().min(0).max(2).optional(),
-  topP: z.number().min(0).max(1).optional(),
-  max_tokens: z.int().min(1).optional(),
-  extra: z.record(z.string(), z.any()).optional(),
+  name: z.string('Model name is required'),
+  id: z.string('Model ID is required'),
+  contextLength: z
+    .int('Context length must be a positive integer')
+    .positive('Context length must be a positive integer'),
+  capabilities: z.array(
+    z.enum(['vision', 'tools'], 'Capabilities must be an array of "vision" and/or "tools"'),
+    'Capabilities array is required',
+  ),
+  temperature: z
+    .number('Temperature must be a number between 0 and 2')
+    .min(0, 'Temperature must be a number between 0 and 2')
+    .max(2, 'Temperature must be a number between 0 and 2')
+    .optional(),
+  topP: z
+    .number('Top P must be a number between 0 and 1')
+    .min(0, 'Top P must be a number between 0 and 1')
+    .max(1, 'Top P must be a number between 0 and 1')
+    .optional(),
+  max_tokens: z
+    .int('Max tokens must be a positive integer')
+    .positive('Max tokens must be a positive integer')
+    .optional(),
+  extra: z
+    .record(z.string(), z.any(), 'Extra properties must be a record of string keys and any values')
+    .optional(),
 });
 export type ModelConfig = z.infer<typeof ModelConfig>;
 
-export function loadModels(): ModelConfig[] {
+export function loadModels(): ModelConfig[] | z.ZodError {
   const filePath = path.resolve(__dirname, '../../models.json');
   const fileContent = fs.readFileSync(filePath, 'utf8');
   const models = JSON.parse(fileContent);
-  return z.array(ModelConfig).parse(models);
+  const parsedModels = z.array(ModelConfig).safeParse(models);
+
+  if (!parsedModels.success) {
+    return parsedModels.error;
+  }
+
+  return parsedModels.data;
 }
 
 export const findModelConfig = (
