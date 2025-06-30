@@ -62,8 +62,14 @@ export const findModelConfig = (
   return models.find((config) => config.name === modelName);
 };
 
-function generateDigest(modelName: string): string {
-  return crypto.createHash('sha256').update(modelName).digest('hex');
+function generateDigest(config: ModelConfig): string {
+  const data = JSON.stringify({
+    name: config.name,
+    id: config.id,
+    contextLength: config.contextLength,
+    capabilities: config.capabilities,
+  });
+  return crypto.createHash('sha256').update(data).digest('hex');
 }
 
 export const generateModelsList = (models: ModelConfig[]) => {
@@ -73,7 +79,7 @@ export const generateModelsList = (models: ModelConfig[]) => {
       model: config.id,
       modified_at: new Date().toISOString(),
       size: 500000000, // Fixed size
-      digest: generateDigest(config.id),
+      digest: generateDigest(config),
       details: {
         parent_model: '',
         format: 'gguf',
