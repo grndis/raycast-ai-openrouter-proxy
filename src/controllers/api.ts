@@ -5,6 +5,7 @@ import { AppContext } from '../app';
 import {
   convertOllamaMessagesToOpenAI,
   convertRaycastToolsToOpenAI,
+  getThoughtsFromResponseDelta,
   makeOllamaChunk,
   makeSSEMessage,
   OllamaChatRequest,
@@ -95,11 +96,16 @@ export const makeApiController = ({ openai, models }: AppContext): ApiController
         let finish_reason: OllamaChunkResponse['done_reason'] = undefined;
 
         for await (const chunk of stream) {
-          const content = chunk.choices[0]?.delta?.content;
-          const toolCalls = chunk.choices[0]?.delta?.tool_calls;
+          const delta = chunk.choices[0]?.delta;
+          const content = delta?.content;
+          const toolCalls = delta?.tool_calls;
+          const thinking = getThoughtsFromResponseDelta(delta);
 
-          if (content) {
-            const ollamaChunk = makeOllamaChunk(requestedModel, content, false);
+          if (thinking) {
+            const ollamaChunk = makeOllamaChunk(requestedModel, { content: '', thinking }, false);
+            res.write(makeSSEMessage(ollamaChunk));
+          } else if (content) {
+            const ollamaChunk = makeOllamaChunk(requestedModel, { content }, false);
             res.write(makeSSEMessage(ollamaChunk));
           }
 
@@ -140,7 +146,13 @@ export const makeApiController = ({ openai, models }: AppContext): ApiController
         }
 
         // Send final chunk with tool calls
-        const finalChunk = makeOllamaChunk(requestedModel, '', true, finish_reason, finalToolCalls);
+        const finalChunk = makeOllamaChunk(
+          requestedModel,
+          { content: '' },
+          true,
+          finish_reason,
+          finalToolCalls,
+        );
         res.write(makeSSEMessage(finalChunk));
         res.end();
       } finally {

@@ -28,9 +28,13 @@ This proxy aims to provide a seamless experience for using custom models within 
 - 🔤 **Chat title generation**: Automatically generate chat titles.
 - 🛑 **Stream cancellation**: Stop ongoing responses from models.
 
+### Partial Support:
+
+- 💭 **Displaying thinking process**: See the model's thinking process.
+  - This feature isn't supported by all providers because the OpenAI API specification does not define a standard for it. For example, when using OpenRouter, the thinking process is always shown by default for supported models. Other providers may not send it by default and require extra setup via the `extra` field in the model's [configuration](#configuration) as described in the provider's documentation.
+
 ### Not Supported:
 
-- 💭 **Displaying thinking process**: Models do not display their thinking process, but thinking models are supported.
 - 🌐 **Remote tools**: Some AI Extensions are classified as "remote tools" and are not supported. These include web search and image generation, as well as some others. You can replace these with MCP servers if you would like similar tools.
 
 ## Requirements

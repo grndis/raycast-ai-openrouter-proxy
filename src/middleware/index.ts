@@ -54,7 +54,7 @@ export const makeMiddleware = (logger: Logger): Middleware => {
       // For chat completion endpoint, check if streaming has started
       if (isChatCompletionEndpoint && res.headersSent) {
         req.log.error(err, loggerMsg);
-        const ollamaChunk = makeOllamaChunk('Unknown', '', true);
+        const ollamaChunk = makeOllamaChunk('Unknown', { content: '' }, true);
         res.write(makeSSEMessage(ollamaChunk));
         res.end();
         return;

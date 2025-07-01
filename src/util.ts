@@ -61,6 +61,7 @@ export interface OllamaChunkResponse {
   message: {
     role: 'assistant';
     content: string;
+    thinking?: string;
     tool_calls?: {
       function: {
         name: string;
@@ -74,7 +75,7 @@ export interface OllamaChunkResponse {
 
 export function makeOllamaChunk(
   model: string,
-  content: string,
+  data: { content: string; thinking?: string },
   done: boolean,
   done_reason?: OllamaChunkResponse['done_reason'],
   toolCalls?: Record<number, ChatCompletionChunk.Choice.Delta.ToolCall>,
@@ -108,7 +109,7 @@ export function makeOllamaChunk(
     created_at: new Date().toISOString(),
     message: {
       role: 'assistant',
-      content,
+      ...data,
       tool_calls: finalToolCalls.length > 0 ? finalToolCalls : undefined,
     },
     done,
@@ -202,4 +203,40 @@ export function convertRaycastToolsToOpenAI(
 
 export function makeSSEMessage(message: OllamaChunkResponse): string {
   return `${JSON.stringify(message)}\n\n`;
+}
+
+type ThinkingDelta =
+  | (ChatCompletionChunk.Choice.Delta & {
+      reasoning?: unknown;
+      reasoning_content?: unknown;
+      extra_content?: {
+        google?: {
+          thought?: unknown;
+        };
+      };
+    })
+  | undefined;
+
+export function getThoughtsFromResponseDelta(delta: ThinkingDelta): string | null {
+  if (!delta) {
+    return null;
+  }
+
+  // Some providers use reasoning or reasoning_content
+  const reasoning = delta.reasoning ?? delta.reasoning_content;
+  if (typeof reasoning === 'string' && reasoning.length > 0) {
+    return reasoning;
+  }
+
+  // Gemini API
+  const googleThought = delta.extra_content?.google?.thought;
+  if (typeof googleThought === 'boolean' && googleThought) {
+    const content = delta.content ?? '';
+    const thinking = content.replace(/<thought>|<\/thought>/g, '');
+    if (thinking.length > 0) {
+      return thinking;
+    }
+  }
+
+  return null;
 }
