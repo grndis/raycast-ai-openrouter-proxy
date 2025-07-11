@@ -23,7 +23,7 @@ async function main() {
   });
   const app = makeApp({ config, middleware, models, openai });
 
-  app.listen(config.port, () => {
+  app.listen(config.port, '0.0.0.0', () => {
     logger.info(`Server is up on port ${config.port}`);
   });
 }
