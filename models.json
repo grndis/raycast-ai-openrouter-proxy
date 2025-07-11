@@ -20,6 +20,12 @@
     "capabilities": ["tools"]
   },
   {
+    "name": "Chiper Alpha",
+    "id": "openrouter/cypher-alpha:free",
+    "contextLength": 1000000,
+    "capabilities": ["tools"]
+  },
+  {
     "name": "GPT-4o Mini",
     "id": "openai/gpt-4o-mini",
     "contextLength": 128000,
@@ -33,3 +39,4 @@
     "temperature": 0.7
   }
 ]
+
