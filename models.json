@@ -20,7 +20,7 @@
     "capabilities": ["tools"]
   },
   {
-    "name": "Chiper Alpha",
+    "name": "Cypher Alpha",
     "id": "openrouter/cypher-alpha:free",
     "contextLength": 1000000,
     "capabilities": ["tools"]
